@@ -11,6 +11,7 @@ from telegram import Updater
 from modules.weather import weather_for_zip, weather_print_result
 from modules.gift import gift
 from modules.stock import stock
+from modules.woot import woot
 
 
 # config
@@ -64,6 +65,14 @@ class thedenBot(object):
         bot.sendMessage(update.message.chat_id, text=gift())
 
     @staticmethod
+    def woot(bot, update):
+        key = update.message.text.rsplit('/woot ')[-1].rsplit(' ')[0]
+        if '/woot' in key:
+            key = 'www'
+        output = woot(key)
+        bot.sendMessage(update.message.chat_id, text=output)
+
+    @staticmethod
     def boterror(bot, update, error):
         bot
         log.warn('Update "%s" caused error "%s"' % (update, error))
@@ -100,6 +109,7 @@ class thedenBot(object):
         self.dp.addTelegramCommandHandler("weather", self.weather)
         self.dp.addTelegramCommandHandler("gift", self.gift)
         self.dp.addTelegramCommandHandler("stock", self.stock)
+        self.dp.addTelegramCommandHandler("woot", self.woot)
 
         # keep an on disk log
         self.dp.addTelegramMessageHandler(self.botlog)
