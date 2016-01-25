@@ -13,8 +13,7 @@ from modules.gift import gift
 from modules.stock import stock
 
 
-
-#config
+# config
 LOG_PATH = '/mnt/brambu_home/telegram_logs/chat_log'
 LOG_FORMAT = '%(asctime)s %(name)s [%(levelname)s] %(message)s'
 log = logging.getLogger(__name__)
@@ -30,7 +29,6 @@ log.addHandler(handler)
 
 
 class thedenBot(object):
-
     def __init__(self, token=None):
         self.token = token
         self.updater = None
@@ -67,19 +65,24 @@ class thedenBot(object):
 
     @staticmethod
     def boterror(bot, update, error):
+        bot
         log.warn('Update "%s" caused error "%s"' % (update, error))
 
     @staticmethod
     def botlog(bot, update):
-        log_msg = "#{title} ({type}) [{first_name} {last_name}] (@{username}) {text}"
+        bot
+        log_msg = "#{title} ({type}) [{first_name} " \
+                  "{last_name}] (@{username}) {text}"
         error_msg = 'error parsing message: ({0}) {1}'
         try:
-            log_msg = log_msg.format(title=update.message.chat.title,
-                                     type=update.message.chat.type,
-                                     first_name=update.message.from_user.first_name,
-                                     last_name=update.message.from_user.last_name,
-                                     username=update.message.from_user.username,
-                                     text=update.message.text)
+            log_msg = log_msg.format(
+                title=update.message.chat.title,
+                type=update.message.chat.type,
+                first_name=update.message.from_user.first_name,
+                last_name=update.message.from_user.last_name,
+                username=update.message.from_user.username,
+                text=update.message.text
+            )
         except BaseException as ex:
             log_msg = error_msg.format(ex, vars(update.message.chat))
         log.info(log_msg)
@@ -109,12 +112,14 @@ class thedenBot(object):
 
         self.updater.idle()
 
+
 def setup_parser(parser):
     parser.add_argument('-v', '--verbose',
                         action='store_true',
                         default=False,
                         help='Be verbose.')
     return parser
+
 
 def main():
     parser = argparse.ArgumentParser()
@@ -126,6 +131,7 @@ def main():
         token='REPLACE_ME_WITH_YOUR_TOKEN'
     )
     bot.run()
+
 
 if __name__ == '__main__':
     main()
