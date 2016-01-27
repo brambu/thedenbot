@@ -8,10 +8,12 @@ import logging
 from logging.handlers import TimedRotatingFileHandler
 
 from telegram import Updater
-from modules.weather import weather_for_zip, weather_print_result
-from modules.gift import gift
-from modules.stock import stock
-from modules.woot import woot
+
+from .modules.weather import weather_for_zip, \
+    weather_print_result
+from .modules.gift import gift
+from .modules.stock import stock
+from .modules.woot import woot
 
 
 # config
