@@ -5,7 +5,6 @@ thedenbot
 
 from setuptools import setup, find_packages
 
-
 def get_requirements():
     with open('requirements.txt') as f:
         required = f.read().splitlines()
