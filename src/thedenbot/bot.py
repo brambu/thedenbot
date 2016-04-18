@@ -8,12 +8,11 @@ import logging
 from logging.handlers import TimedRotatingFileHandler
 
 from telegram import Updater
-
-from .modules.weather import weather_for_zip, \
-    weather_print_result
+from .modules.weather import weather_get
 from .modules.gift import gift
 from .modules.stock import stock
 from .modules.woot import woot
+
 
 
 # config
@@ -47,13 +46,12 @@ class thedenBot(object):
 
     @staticmethod
     def weather(bot, update):
-        zip_code = '10001'
+        weather_input = 'New York, NY'
         try:
-            zip_code = update.message.text.rsplit('/weather ')[-1]
+            weather_input = update.message.text.rsplit('/weather ')[-1]
         except BaseException as ex:
             log.error('Error reading command weather: {0}'.format(ex))
-        weather_result = weather_for_zip(zip_code)
-        printthis = weather_print_result(weather_result, mode='winter')
+        printthis = weather_get(weather_input)
         bot.sendMessage(update.message.chat_id, text=printthis)
 
     @staticmethod
