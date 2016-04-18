@@ -48,7 +48,7 @@ def weather_print_result(address, result):
         u'Low: {daily[data][0][temperatureMin]:0.0f}\u00b0F'
         u'/{daily_min_c}\u00b0C ',
         u'',
-        u'{minutely[summary]} ',
+        # u'{minutely[summary]} ',
         u'{hourly[summary]} ',
         u'{daily[summary]}'
     ]
