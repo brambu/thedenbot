@@ -13,6 +13,7 @@ from thedenbot.modules.weather import weather_get
 from thedenbot.modules.gift import gift
 from thedenbot.modules.stock import stock
 from thedenbot.modules.woot import woot
+from thedenbot.modules.speak_tts import speak_bot_speak
 
 # config
 LOG_FORMAT = '%(asctime)s %(name)s [%(levelname)s] %(message)s'
@@ -67,6 +68,13 @@ class thedenBot(object):
         bot.sendMessage(update.message.chat_id, text=output)
 
     @staticmethod
+    def speak(bot, update):
+        msg = update.message.text.rsplit('/speak ')[-1]
+        file_handle = speak_bot_speak(msg)
+        bot.sendVoice(update.message.chat_id, voice=file_handle)
+        file_handle.close()
+
+    @staticmethod
     def bot_error(bot, update, error):
         log.warn(u'%s Update "%s" caused error "%s"', bot, update, error)
 
@@ -103,6 +111,7 @@ class thedenBot(object):
         self.dp.add_handler(CommandHandler("gift", self.gift))
         self.dp.add_handler(CommandHandler("stock", self.stock))
         self.dp.add_handler(CommandHandler("woot", self.woot))
+        self.dp.add_handler(CommandHandler("speak", self.speak))
 
         # keep an on disk log
         self.dp.add_handler(MessageHandler(Filters.all, self.bot_log))

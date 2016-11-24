@@ -13,7 +13,7 @@ def get_requirements():
 
 setup(
     name='thedenbot',
-    version='0.0.5',
+    version='0.0.6',
     description='a telegram bot',
     package_dir={'': 'src'},
     packages=find_packages(where='src'),
