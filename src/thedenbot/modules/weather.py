@@ -15,6 +15,8 @@ def mphtokph(x):
 def weather_for_input(input, token=None):
     geolocator = Nominatim(country_bias='US')
     location = geolocator.geocode(input)
+    if location is None:
+        return None, None
     ret = forecastio.load_forecast(token,
                                    location.latitude,
                                    location.longitude,
@@ -24,6 +26,8 @@ def weather_for_input(input, token=None):
 
 
 def weather_print_result(address, result):
+    if address is None or result is None:
+        return "aroo?"
     args = {}
     args.update(**result)
     args.update(address=address)
