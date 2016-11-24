@@ -13,7 +13,7 @@ def mphtokph(x):
 
 
 def weather_for_input(input, token=None):
-    geolocator = Nominatim()
+    geolocator = Nominatim(country_bias='US')
     location = geolocator.geocode(input)
     ret = forecastio.load_forecast(token,
                                    location.latitude,
