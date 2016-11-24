@@ -13,7 +13,10 @@ def mphtokph(x):
 
 
 def weather_for_input(input, token=None):
-    geolocator = Nominatim(country_bias='US')
+    country_bias = None
+    if input.isdigit():
+        country_bias = 'US'
+    geolocator = Nominatim(country_bias=country_bias)
     location = geolocator.geocode(input)
     if location is None:
         return None, None
