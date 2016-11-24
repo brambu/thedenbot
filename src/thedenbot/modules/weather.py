@@ -1,10 +1,7 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 
 import forecastio
 from geopy.geocoders import Nominatim
-
-
-API_KEY = "REPLACE_ME"
 
 
 def ftoc(x):
@@ -15,10 +12,10 @@ def mphtokph(x):
     return x * 1.60934
 
 
-def weather_for_input(input):
+def weather_for_input(input, token=None):
     geolocator = Nominatim()
     location = geolocator.geocode(input)
-    ret = forecastio.load_forecast(API_KEY,
+    ret = forecastio.load_forecast(token,
                                    location.latitude,
                                    location.longitude,
                                    units='us')
@@ -27,8 +24,6 @@ def weather_for_input(input):
 
 
 def weather_print_result(address, result):
-    printthis = 'Unknown.'
-
     args = {}
     args.update(**result)
     args.update(address=address)
@@ -54,8 +49,10 @@ def weather_print_result(address, result):
     ]
 
     try:
-        dt_current_time = datetime.fromtimestamp(args['currently']['time'])
+        dt_current_time = datetime.utcfromtimestamp(args['currently']['time'])
+        dt_current_time += timedelta(hours=args['offset'])
         current_time = dt_current_time.strftime('%Y/%m/%d %H:%M:%S')
+
         args.update(address=address)
         args.update(current_time=current_time)
         args.update(
@@ -84,7 +81,7 @@ def weather_print_result(address, result):
     return printthis
 
 
-def weather_get(input):
-    address, result = weather_for_input(input)
+def weather_get(input, token=None):
+    address, result = weather_for_input(input, token=token)
     printthis = weather_print_result(address, result)
     return printthis
