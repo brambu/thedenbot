@@ -75,6 +75,13 @@ class thedenBot(object):
         file_handle.close()
 
     @staticmethod
+    def sprechen(bot, update):
+        msg = update.message.text.rsplit('/sprechen ')[-1]
+        file_handle = speak_bot_speak(msg, 'de')
+        bot.sendVoice(update.message.chat_id, voice=file_handle)
+        file_handle.close()
+
+    @staticmethod
     def bot_error(bot, update, error):
         log.warn(u'%s Update "%s" caused error "%s"', bot, update, error)
 
@@ -112,6 +119,7 @@ class thedenBot(object):
         self.dp.add_handler(CommandHandler("stock", self.stock))
         self.dp.add_handler(CommandHandler("woot", self.woot))
         self.dp.add_handler(CommandHandler("speak", self.speak))
+        self.dp.add_handler(CommandHandler("sprechen", self.sprechen))
 
         # keep an on disk log
         self.dp.add_handler(MessageHandler(Filters.all, self.bot_log))
