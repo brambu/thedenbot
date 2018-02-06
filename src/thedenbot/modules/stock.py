@@ -12,7 +12,7 @@ def fetchstockinfo(search):
         data = res.read()
         data = data.replace('\n', '').split('//')[1].strip()
         jsondata = json.loads(data)
-    except:
+    except BaseException:
         pass
     return jsondata
 
@@ -28,7 +28,7 @@ def parse_result(result):
             printthis += printthis_e
         try:
             return printthis.format(**entry)
-        except:
+        except BaseException:
             return "I can't parse the result."
 
 

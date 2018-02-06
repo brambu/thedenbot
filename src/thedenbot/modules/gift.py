@@ -35,11 +35,10 @@ def gift_print_entry(entry):
 
 def gift():
     urls = [
-        'http://feeds.feedburner.com/ThisIsWhyImBroke?format=xml',
         'http://theworstthingsforsale.com/feed/',
-        'https://www.etsy.com/shop/MugSociety29/rss'
     ]
-    url = urls[random.randint(0, len(urls) - 1)]
+    # url = urls[random.randint(0, len(urls) - 1)]
+    url = urls[0]
     return gift_print_entry(gift_fetch(url))
 
 

@@ -3,6 +3,7 @@
 .. codeauthor:: brambu
 This is a telegram bot
 '''
+
 import argparse
 import logging
 from logging.handlers import TimedRotatingFileHandler
@@ -27,66 +28,74 @@ config = {}
 class thedenBot(object):
     def __init__(self, token=None):
         self.token = token
-        self.updater = None
-        self.dp = None
+
+    @staticmethod
+    def sanitize_msg(msg):
+        if msg is None:
+            return msg
+        if len(msg.split(' ')) < 2:
+            return msg
+        msg = msg.split('/')[1:]
+        msg = '/'.join(msg)
+        msg = msg.split(' ')[1:]
+        msg = ' '.join(msg)
+        return msg
 
     @staticmethod
     def start(bot, update):
         bot.sendMessage(update.message.chat_id, text='Bark bark!')
+        thedenBot.bot_log(bot, update)
 
     @staticmethod
     def help_me(bot, update):
         bot.sendMessage(update.message.chat_id, text='*whine?*')
+        thedenBot.bot_log(bot, update)
 
     @staticmethod
     def weather(bot, update):
         token = config.get('darksky_token')
         weather_input = 'New York, NY'
         try:
-            weather_input = update.message.text.rsplit('/weather ')[-1]
+            weather_input = thedenBot.sanitize_msg(update.message.text)
         except BaseException as ex:
             log.error(u'Error reading command weather: %s', ex)
         print_this = weather_get(weather_input, token=token)
         bot.sendMessage(update.message.chat_id, text=print_this)
+        thedenBot.bot_log(bot, update)
 
     @staticmethod
     def stock(bot, update):
-        searches = update.message.text.rsplit('/stock ')[-1].rsplit(' ')
+        searches = thedenBot.sanitize_msg(update.message.text).split(' ')
         output = stock(searches)
         bot.sendMessage(update.message.chat_id, text=output)
+        thedenBot.bot_log(bot, update)
 
     @staticmethod
     def gift(bot, update):
         bot.sendMessage(update.message.chat_id, text=gift())
+        thedenBot.bot_log(bot, update)
 
     @staticmethod
     def woot(bot, update):
-        key = update.message.text.rsplit('/woot ')[-1].rsplit(' ')[0]
-        if '/woot' in key:
-            key = 'www'
+        key = thedenBot.sanitize_msg(update.message.text)
         output = woot(key)
         bot.sendMessage(update.message.chat_id, text=output)
+        thedenBot.bot_log(bot, update)
 
     @staticmethod
-    def speak(bot, update):
-        msg = update.message.text.rsplit('/speak ')[-1]
-        file_handle = speak_bot_speak(msg)
-        bot.sendVoice(update.message.chat_id, voice=file_handle)
-        file_handle.close()
+    def speak(bot, update, lang='en'):
+        msg = thedenBot.sanitize_msg(update.message.text)
+        with speak_bot_speak(msg, lang) as fh:
+            bot.sendVoice(update.message.chat_id, voice=fh)
+        thedenBot.bot_log(bot, update)
 
     @staticmethod
     def sprechen(bot, update):
-        msg = update.message.text.rsplit('/sprechen ')[-1]
-        file_handle = speak_bot_speak(msg, 'de')
-        bot.sendVoice(update.message.chat_id, voice=file_handle)
-        file_handle.close()
+        thedenBot.speak(bot, update, lang='de')
 
     @staticmethod
     def hanashite(bot, update):
-        msg = update.message.text.rsplit('/hanashite ')[-1]
-        file_handle = speak_bot_speak(msg, 'ja')
-        bot.sendVoice(update.message.chat_id, voice=file_handle)
-        file_handle.close()
+        thedenBot.speak(bot, update, lang='ja')
 
     @staticmethod
     def bot_error(bot, update, error):
@@ -113,32 +122,41 @@ class thedenBot(object):
 
     def run(self):
         # Create the EventHandler and pass it your bot's token.
-        self.updater = Updater(self.token)
-
-        # Get the dispatcher to register handlers
-        self.dp = self.updater.dispatcher
+        updater = Updater(self.token)
 
         # on different commands - answer in Telegram
-        self.dp.add_handler(CommandHandler("start", self.start))
-        self.dp.add_handler(CommandHandler("help", self.help_me))
-        self.dp.add_handler(CommandHandler("weather", self.weather))
-        self.dp.add_handler(CommandHandler("gift", self.gift))
-        self.dp.add_handler(CommandHandler("stock", self.stock))
-        self.dp.add_handler(CommandHandler("woot", self.woot))
-        self.dp.add_handler(CommandHandler("speak", self.speak))
-        self.dp.add_handler(CommandHandler("sprechen", self.sprechen))
-        self.dp.add_handler(CommandHandler("hanashite", self.hanashite))
+        handlers = {
+            'start': self.start,
+            'help': self.help_me,
+            'weather': self.weather,
+            'stock': self.stock,
+            'gift': self.gift,
+            'woot': self.woot,
+            'speak': self.speak,
+            'sprechen': self.sprechen,
+            'hanashite': self.hanashite,
+        }
+        for command, callback in handlers.iteritems():
+            updater.dispatcher.add_handler(
+                CommandHandler(command, callback)
+            )
 
-        # keep an on disk log
-        self.dp.add_handler(MessageHandler(Filters.all, self.bot_log))
+        updater.dispatcher.add_handler(
+            MessageHandler(Filters.all, self.bot_log)
+        )
 
         # log all errors
-        self.dp.add_error_handler(self.bot_error)
+        updater.dispatcher.add_error_handler(self.bot_error)
 
         # Start the Bot
-        self.updater.start_polling()
+        updater.start_polling(
+            timeout=30,
+            read_latency=5,
+            bootstrap_retries=3,
+            poll_interval=0.3,
+        )
 
-        self.updater.idle()
+        updater.idle()
 
 
 def setup_parser(parser):

@@ -8,16 +8,22 @@ log = logging.getLogger(__name__)
 
 def woot_fetch(url, key='www'):
     result = []
+    backup_result = []
     wootfeed = feedparser.parse(url)
+    if '/woot' in key:
+        key = 'www'
     try:
         for entry in wootfeed['entries']:
             entrykey = \
                 entry.woot_purchaseurl.split('/')[2].split('.')[0]
             if key == entrykey:
                 result.append(entry)
+            if key == 'www':
+                backup_result.append(entry)
+        if not result:
+            result = backup_result
     except BaseException as ex:
-        log.warn('woot fetching error:  '
-                 '{0} ({1})'.format(entry, ex))
+        log.warn('woot fetching error: ({0})'.format(ex))
         return
     return result
 
@@ -37,8 +43,7 @@ def format_result(result):
             out.extend([title, price, purchaseurl])
             return " ".join(out)
     except BaseException as ex:
-        log.warn('woot formatting parsing error: '
-                 '{0} ({1})'.format(result, ex))
+        log.warn('woot formatting parsing error: ({0})'.format(ex))
     return
 
 

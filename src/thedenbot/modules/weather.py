@@ -82,7 +82,7 @@ def weather_print_result(address, result):
         )
         printthis = ""
         printthis += '\n'.join(template).format(**args)
-    except:
+    except BaseException:
         printthis = 'Not sure.'
 
     return printthis
