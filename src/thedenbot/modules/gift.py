@@ -23,14 +23,14 @@ def gift_print_entry(entry):
     try:
         link = entry.id
         title = entry.title
-        summary = h.unescape(entry.summary).encode('ascii', 'ignore')
+        summary = h.unescape(entry.summary).encode('utf-8', 'ignore')
         summary = html2text.html2text(summary)
         if 'USD' in summary:
             summary = '{0}USD'.format(summary.rsplit('USD')[0])
     except BaseException as ex:
         log.error('good: cannot parse entry {0} ({1})'.format(entry, ex))
         return 'not sure'
-    return "{0} {1} {2}".format(title, summary, link)
+    return u"{0} {1} {2}".format(title, summary, link)
 
 
 def gift():
