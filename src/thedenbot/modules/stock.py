@@ -33,6 +33,13 @@ def parse_result(result):
             continue
         if key == 'latestUpdate' or 'Time' in key:
             result[key] = format_time(value)
+        if 'hangePercent' in key:
+            result[key] = '{0:.2f}'.format(float(value) * 100.0)
+        if key == 'change' or key == 'extendedChange':
+            prefix = ''
+            if float(value) > 0:
+                prefix = '+'
+            result[key] = '{0}{1:.2f}'.format(prefix, value)
 
     printthis = "{companyName} :: {symbol}\n" \
                 "{primaryExchange} :: {sector}\n" \
