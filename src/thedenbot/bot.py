@@ -136,7 +136,7 @@ class thedenBot(object):
             'sprechen': self.sprechen,
             'hanashite': self.hanashite,
         }
-        for command, callback in handlers.iteritems():
+        for command, callback in handlers.items():
             updater.dispatcher.add_handler(
                 CommandHandler(command, callback)
             )

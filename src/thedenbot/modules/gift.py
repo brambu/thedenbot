@@ -1,7 +1,7 @@
 import logging
 import random
 import feedparser
-from HTMLParser import HTMLParser
+import html
 import html2text
 
 log = logging.getLogger(__name__)
@@ -19,11 +19,11 @@ def gift_fetch(url):
 
 
 def gift_print_entry(entry):
-    h = HTMLParser()
     try:
         link = entry.id
         title = entry.title
-        summary = h.unescape(entry.summary).encode('utf-8', 'ignore')
+        summary = html.unescape(entry.summary).encode('utf-8', 'ignore')
+        summary = summary.decode('utf-8')
         summary = html2text.html2text(summary)
         if 'USD' in summary:
             summary = '{0}USD'.format(summary.rsplit('USD')[0])
@@ -47,4 +47,4 @@ if __name__ == "__main__":
     log = logging.getLogger(__name__)
     logging.basicConfig(level=logging.INFO,
                         format=LOG_FORMAT)
-    print gift()
+    print(gift())
