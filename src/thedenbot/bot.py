@@ -17,6 +17,8 @@ from thedenbot.modules.speak_tts import speak_bot_speak
 from thedenbot.modules.start import start
 from thedenbot.modules.weather import weather_get
 
+log = logging.getLogger(__name__)
+
 
 class Thedenbot(object):
     def __init__(self, config_path=None):
@@ -37,7 +39,7 @@ class Thedenbot(object):
             log.warning(u'Configuration error %s %s',
                         type(ex), ex.args)
         self.token = config.get('bot_token')
-        del(config['bot_token'])
+        del config['bot_token']
         self.config = config
 
     def run(self):
@@ -60,7 +62,9 @@ class Thedenbot(object):
             for handler in text_handlers:
                 await handler(update, context)
 
-        application.add_handler(MessageHandler(filters.TEXT, root_text_handler))
+        application.add_handler(
+            MessageHandler(filters.TEXT, root_text_handler),
+        )
         application.run_polling()
 
 

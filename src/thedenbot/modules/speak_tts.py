@@ -11,4 +11,7 @@ async def speak_bot_speak(update: Update, context: ContextTypes.DEFAULT_TYPE):
     tmp = TemporaryFile()
     tts.write_to_fp(tmp)
     tmp.seek(0, 0)
-    await update.message.reply_audio(tmp, reply_to_message_id=update.message.message_id)
+    await update.message.reply_audio(
+        tmp,
+        reply_to_message_id=update.message.message_id,
+    )
