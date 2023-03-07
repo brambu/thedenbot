@@ -20,7 +20,7 @@ def get_log(log_path=None):
     return log
 
 
-async def bot_log(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def bot_log(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     global log
     log_msg = u'#{title} ({type}) [{first_name} ' \
               u'{last_name}] (@{username}) {text}'
