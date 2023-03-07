@@ -4,7 +4,10 @@ from telegram import Update
 from telegram.ext import ContextTypes
 
 
-async def speak_bot_speak(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def speak_bot_speak(
+        update: Update,
+        context: ContextTypes.DEFAULT_TYPE,
+) -> None:
     text = update.message.text
     text = text.removeprefix('/speak ')
     tts = gTTS(text=text, lang='en')

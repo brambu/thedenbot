@@ -80,7 +80,10 @@ def weather_print_result(address, result):
     return print_this
 
 
-async def weather_get(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def weather_get(
+        update: Update,
+        context: ContextTypes.DEFAULT_TYPE,
+) -> None:
     token = context.application.bot_data.get('config', {}).get('darksky_token')
     text = update.message.text
     text = text.removeprefix('/weather ')
