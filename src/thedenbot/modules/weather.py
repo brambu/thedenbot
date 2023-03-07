@@ -90,4 +90,7 @@ async def weather_get(update: Update, context: ContextTypes.DEFAULT_TYPE):
     except BaseException as ex:
         print_this = 'not sure'
         print_this += " ({})".format(ex)
-    await update.message.reply_text(print_this, reply_to_message_id=update.message.message_id)
+    await update.message.reply_text(
+        print_this,
+        reply_to_message_id=update.message.message_id,
+    )
