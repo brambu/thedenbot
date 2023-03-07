@@ -1,14 +1,16 @@
-from telegram import Update
-from telegram.ext import ContextTypes
+""" bot_log handler """
 from logging import getLogger, Formatter
 from logging.handlers import TimedRotatingFileHandler
 
+from telegram import Update
+from telegram.ext import ContextTypes
+
 
 LOG_FORMAT = '%(asctime)s [%(levelname)s] %(message)s'
-log = None
 
 
 def get_log(log_path=None):
+    """ configure log for log_path, should only be run once at init """
     log = getLogger(__name__)
     handler = TimedRotatingFileHandler(log_path,
                                        when="d",
@@ -21,11 +23,12 @@ def get_log(log_path=None):
 
 
 async def bot_log(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    global log
-    log_msg = u'#{title} ({type}) [{first_name} ' \
-              u'{last_name}] (@{username}) {text}'
-    error_msg = u'error parsing message: ({0}) {1}'
+    """ listens to all messages with text and logs to file """
+    log_msg = '#{title} ({type}) [{first_name} ' \
+              '{last_name}] (@{username}) {text}'
+    error_msg = 'error parsing message: ({0}) {1}'
     log_path = context.application.bot_data.get('config', {}).get('log_path')
+    log = context.application.bot_data.get('log')
     if log is None:
         log = get_log(log_path)
     try:
@@ -40,3 +43,4 @@ async def bot_log(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     except BaseException as ex:
         log_msg = error_msg.format(ex, vars(update.message.chat))
     log.info(log_msg)
+    context.application.bot_data['log'] = log

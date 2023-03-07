@@ -1,3 +1,7 @@
+"""thedenbot
+
+a python telegram bot
+"""
 from .bot import Thedenbot, main
 
 __author__ = 'brambu'

@@ -1,19 +1,26 @@
+""" /weather command """
 from datetime import datetime, timedelta
+from logging import getLogger
 from forecastio import load_forecast
 from geopy.geocoders import Nominatim
 from telegram import Update
 from telegram.ext import ContextTypes
 
-
-def f_to_c(x):
-    return int((float(x) - 32.0) / 1.8)
+log = getLogger(__name__)
 
 
-def mph_to_kph(x):
-    return x * 1.60934
+def f_to_c(f_temp):
+    """ convert temp unit """
+    return int((float(f_temp) - 32.0) / 1.8)
+
+
+def mph_to_kph(mph):
+    """ convert speed unit """
+    return mph * 1.60934
 
 
 def weather_for_input(text, token=None):
+    """ get weather for input like 'San Jose' """
     geolocator = Nominatim(user_agent='brambu/thedenbot/modules/weather')
     location = geolocator.geocode(text)
     if location is None:
@@ -27,6 +34,7 @@ def weather_for_input(text, token=None):
 
 
 def weather_print_result(address, result):
+    """ print a forecastio forecast result """
     print_this = ''
     if address is None or result is None:
         print_this += 'aroo?'
@@ -35,23 +43,23 @@ def weather_print_result(address, result):
     args.update(**result)
     args.update(address=address)
     template = [
-        u'Weather for {address}',
-        u'{current_time} {timezone}',
-        u'',
-        u'Currently: {currently[summary]} '
-        u'{currently[temperature]:0.0f}\u00b0F/{current_temperature_c}\u00b0C '
-        u'Feels like: {currently[apparentTemperature]:0.0f}\u00b0F'
-        u'/{feels_like_c}\u00b0C',
-        u'humidity: {humidity_pct}%, wind: {currently[windSpeed]}mph'
-        u'/{wind_kph:.2f}kph',
-        u'High: {daily[data][0][temperatureMax]:0.0f}\u00b0F'
-        u'/{daily_max_c}\u00b0C '
-        u'Low: {daily[data][0][temperatureMin]:0.0f}\u00b0F'
-        u'/{daily_min_c}\u00b0C ',
-        u'',
-        # u'{minutely[summary]} ',
-        u'{hourly[summary]} ',
-        u'{daily[summary]}'
+        'Weather for {address}',
+        '{current_time} {timezone}',
+        '',
+        'Currently: {currently[summary]} '
+        '{currently[temperature]:0.0f}\u00b0F/{current_temperature_c}\u00b0C '
+        'Feels like: {currently[apparentTemperature]:0.0f}\u00b0F'
+        '/{feels_like_c}\u00b0C',
+        'humidity: {humidity_pct}%, wind: {currently[windSpeed]}mph'
+        '/{wind_kph:.2f}kph',
+        'High: {daily[data][0][temperatureMax]:0.0f}\u00b0F'
+        '/{daily_max_c}\u00b0C '
+        'Low: {daily[data][0][temperatureMin]:0.0f}\u00b0F'
+        '/{daily_min_c}\u00b0C ',
+        '',
+        # '{minutely[summary]} ',
+        '{hourly[summary]} ',
+        '{daily[summary]}'
     ]
     dt_current_time = datetime.utcfromtimestamp(args['currently']['time'])
     dt_current_time += timedelta(hours=args['offset'])
@@ -84,6 +92,7 @@ async def weather_get(
         update: Update,
         context: ContextTypes.DEFAULT_TYPE,
 ) -> None:
+    """ example /weather San Jose """
     token = context.application.bot_data.get('config', {}).get('darksky_token')
     text = update.message.text
     text = text.removeprefix('/weather ')
@@ -92,7 +101,7 @@ async def weather_get(
         print_this = weather_print_result(address, result)
     except BaseException as ex:
         print_this = 'not sure'
-        print_this += " ({})".format(ex)
+        log.warning('weather error %s', ex)
     await update.message.reply_text(
         print_this,
         reply_to_message_id=update.message.message_id,
